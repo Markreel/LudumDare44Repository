@@ -8,9 +8,37 @@ public class GodManager : MonoBehaviour
 {
     public static GodManager Instance;
     public enum Choices { WindGod, SunGod, BuildingGod, VolcanoGod, FurtilityGod }
+    public Choices currentChoice;
+
 
     public PlayableDirector Director;
     public Cutscene[] Cutscenes;
+
+    [Space]
+
+    public PlayableAsset PanToPitPlayable;
+
+    [Space]
+
+    public PlayableAsset WindGodPlayable;
+    public PlayableAsset SunGodPlayable;
+    public PlayableAsset BuildingGodPlayable;
+    public PlayableAsset VolcanoGodPlayable;
+    public PlayableAsset FurtilityGodPlayable;
+
+    [Space]
+
+    public PlayableAsset SunGoingDown1;
+    public PlayableAsset SunGoingDown2; //Pikdonker - Game over
+
+    [Space]
+
+    public PlayableAsset VolcanoLevel1;
+    public PlayableAsset VolcanoLevel2;
+    public PlayableAsset VolcanoLevel3;
+    public PlayableAsset VolcanoLevel4;
+    public PlayableAsset VolcanoLevel5; //(Uitbarsting) - Game over
+
 
     public int CurrentLevel;
 
@@ -36,168 +64,69 @@ public class GodManager : MonoBehaviour
 
     public void OnChoiceMade(int _choiceIndex)
     {
-        OnChoiceMade((Choices)_choiceIndex);
+        Director.playableAsset = PanToPitPlayable;
+        Director.Play();
+
         AIManager.Instance.SetSacrificePoints();
+
+        currentChoice = (Choices)_choiceIndex;
     }
 
-    public void OnCullingDone(Choices _choice)
+    public void OnCullingDone()
     {
-        switch (CurrentLevel)
+        switch (currentChoice)
         {
-            case 0:
-                switch (_choice)
-                {
-                    case Choices.WindGod:
-                        break;
-                    case Choices.SunGod:
-                        break;
-                    case Choices.BuildingGod:
-                        break;
-                    case Choices.VolcanoGod:
-                        Director.playableAsset = Cutscenes[CurrentLevel].Shots[1];
-                        break;
-                    case Choices.FurtilityGod:
-                        break;
-                }
+            case Choices.WindGod:
+                WindGodActive = true;
+                Director.playableAsset = WindGodPlayable;
                 break;
-            case 1:
-                Director.playableAsset = Cutscenes[CurrentLevel].Shots[0];
+            case Choices.SunGod:
+                SunGodActive = true;
+                Director.playableAsset = SunGodPlayable;
                 break;
-            case 2:
-                Director.playableAsset = Cutscenes[CurrentLevel].Shots[0];
+            case Choices.BuildingGod:
+                BuildingGodActive = true;
+                Director.playableAsset = BuildingGodPlayable;
+                break;
+            case Choices.VolcanoGod:
+                VolcanoGodActive = true;
+                Director.playableAsset = VolcanoGodPlayable;
+                break;
+            case Choices.FurtilityGod:
+                FurtilityGodActive = true;
+                Director.playableAsset = FurtilityGodPlayable;
                 break;
         }
 
-        CurrentLevel++;
+
         Director.Play();
 
+        Invoke("LevelUpGods", (float)Director.duration);
         AIManager.Instance.Invoke("ReturnToHome", (float)Director.duration);
-    }
-
-    public void OnChoiceMade(Choices _choice)
-    {
-        UIManager.Instance.ChangeCanvasActivity(false);
-
-        switch (CurrentLevel)
-        {
-            case 0:
-                switch (_choice)
-                {
-                    case Choices.WindGod:
-                        break;
-                    case Choices.SunGod:
-                        break;
-                    case Choices.BuildingGod:
-                        break;
-                    case Choices.VolcanoGod:
-                        Director.playableAsset = Cutscenes[CurrentLevel].Shots[0];
-                        break;
-                    case Choices.FurtilityGod:
-                        break;
-                }
-                break;
-
-            case 1:
-                switch (_choice)
-                {
-                    case Choices.WindGod:
-                        break;
-                    case Choices.SunGod:
-                        break;
-                    case Choices.BuildingGod:
-                        break;
-                    case Choices.VolcanoGod:
-                        Director.playableAsset = Cutscenes[CurrentLevel].Shots[0];
-                        break;
-                    case Choices.FurtilityGod:
-                        break;
-                }
-                break;
-
-            case 2:
-                switch (_choice)
-                {
-                    case Choices.WindGod:
-                        break;
-                    case Choices.SunGod:
-                        break;
-                    case Choices.BuildingGod:
-                        break;
-                    case Choices.VolcanoGod:
-                        Director.playableAsset = Cutscenes[CurrentLevel].Shots[0];
-                        break;
-                    case Choices.FurtilityGod:
-                        break;
-                }
-                break;
-
-            case 3:
-                switch (_choice)
-                {
-                    case Choices.WindGod:
-                        break;
-                    case Choices.SunGod:
-                        break;
-                    case Choices.BuildingGod:
-                        break;
-                    case Choices.VolcanoGod:
-                        Director.playableAsset = Cutscenes[CurrentLevel].Shots[0];
-                        break;
-                    case Choices.FurtilityGod:
-                        break;
-                }
-                break;
-
-            case 4:
-                switch (_choice)
-                {
-                    case Choices.WindGod:
-                        break;
-                    case Choices.SunGod:
-                        break;
-                    case Choices.BuildingGod:
-                        break;
-                    case Choices.VolcanoGod:
-                        Director.playableAsset = Cutscenes[CurrentLevel].Shots[0];
-                        break;
-                    case Choices.FurtilityGod:
-                        break;
-                }
-                break;
-
-            case 5:
-                switch (_choice)
-                {
-                    case Choices.WindGod:
-                        break;
-                    case Choices.SunGod:
-                        break;
-                    case Choices.BuildingGod:
-                        break;
-                    case Choices.VolcanoGod:
-                        Director.playableAsset = Cutscenes[CurrentLevel].Shots[0];
-                        break;
-                    case Choices.FurtilityGod:
-                        break;
-                }
-                break;
-        }
-        Director.Play();
     }
 
     void LevelUpGods()
     {
         if (!WindGodActive)
             WindLevel++;
+        else
+            WindLevel = 0;
+
 
         if (!SunGodActive)
             SunLevel++;
+        else
+            SunLevel = 0;
+
 
         if (BuildingGodActive)
             BuildingLevel++;
 
         if (!VolcanoGodActive)
             VolcanoLevel++;
+        else
+            VolcanoLevel = 0;
+
 
         if (FurtilityGodActive)
             FurtilityLevel++;
@@ -207,14 +136,16 @@ public class GodManager : MonoBehaviour
 
     void CheckGodStatus()
     {
-        switch(SunLevel)
+        switch (SunLevel)
         {
             case 1:
-                //avond
+                Director.playableAsset = SunGoingDown1;
+                Director.Play();
                 break;
 
             case 2:
-                //pikdonker - GAME OVER
+                Director.playableAsset = SunGoingDown2;
+                Director.Play();
                 break;
         }
 
@@ -283,7 +214,7 @@ public class GodManager : MonoBehaviour
                 break;
         }
 
-        switch(FurtilityLevel)
+        switch (FurtilityLevel)
         {
             case 1:
                 //+15 mensen
@@ -312,5 +243,6 @@ public class GodManager : MonoBehaviour
 [System.Serializable]
 public class Cutscene
 {
+    public string Name = "New Cutscene";
     public PlayableAsset[] Shots;
 }

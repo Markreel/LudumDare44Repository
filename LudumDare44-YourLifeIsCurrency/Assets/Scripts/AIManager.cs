@@ -19,6 +19,9 @@ public class AIManager : MonoBehaviour
     public List<Transform> BigHousePoints = new List<Transform>();
     public Transform PalacePoint;
 
+    [Header("Settings:")]
+    public float DelayPerSuicide = 3;
+
     Coroutine spawnNPCsRoutine;
     Coroutine cullingRoutine;
 
@@ -179,7 +182,7 @@ public class AIManager : MonoBehaviour
         //Pick 5 random people from the front row to die
         for (int i = 0; i < 5; i++)
         {
-            yield return new WaitForSeconds(3f);
+            yield return new WaitForSeconds(DelayPerSuicide);
 
 
             int randomIndex = Random.Range(0, randomNumberList.Count);
@@ -209,8 +212,8 @@ public class AIManager : MonoBehaviour
             RemoveNPC(_npc);
         }
 
-        //Activate cutscene and after culling events
-        GodManager.Instance.OnCullingDone(GodManager.Choices.VolcanoGod);
+        //Activate after culling behaviour
+        GodManager.Instance.OnCullingDone();
 
         yield return null;
     }

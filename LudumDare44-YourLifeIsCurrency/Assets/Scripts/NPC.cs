@@ -20,7 +20,7 @@ public class NPC : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
     }
 
-    public void StartWalkingTowardsPit(Vector3 _targetPoint, Transform _pitTransform)
+    public void StartWalkingTowardsPoint(Vector3 _targetPoint, Transform _pitTransform = null)
     {
         agent.destination = Target = _targetPoint;
         PitTransform = _pitTransform;
@@ -39,7 +39,8 @@ public class NPC : MonoBehaviour
         if (transform.position == agent.destination && !AtDestination)
         {
             //Debug.Log("AtDestination");
-            transform.LookAt(PitTransform);
+            if (PitTransform != null)
+                transform.LookAt(PitTransform);
             AtDestination = true;
             AIManager.Instance.CheckIfAllAtDestination();
         }
@@ -47,6 +48,18 @@ public class NPC : MonoBehaviour
 
     public void JumpInPit()
     {
-        Destroy(gameObject);
+        animator.SetBool("IsBowing", false);
+        animator.SetBool("IsJumpingInPit", true);
+        //Destroy(gameObject);
+    }
+
+    public void BowToPit()
+    {
+        animator.SetBool("IsBowing", true);
+    }
+
+    public void StopBowing()
+    {
+        animator.SetBool("IsBowing", false);
     }
 }

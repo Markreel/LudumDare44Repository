@@ -12,6 +12,12 @@ public class AIManager : MonoBehaviour
     public GameObject WellParent;
     List<Transform> standingPoints = new List<Transform>();
 
+    public GameObject OutsidePointsParent;
+    List<Transform> OutsidePoints = new List<Transform>();
+    public List<Transform> SmallHousePoints = new List<Transform>();
+    public List<Transform> BigHousePoints = new List<Transform>();
+    public Transform PalacePoint;
+
     Coroutine cullingRoutine;
 
     private void Awake()
@@ -30,19 +36,44 @@ public class AIManager : MonoBehaviour
             standingPoints.Add(_point);
         }
 
-        SetSacrificePoints();
+        foreach (Transform _point in OutsidePointsParent.transform)
+        {
+            OutsidePoints.Add(_point);
+        }
     }
 
-    void SetSacrificePoints()
+    public void ReturnToHome()
+    {
+        List<Transform> VarifiedPoints = new List<Transform>();
+        foreach (var _point in BigHousePoints)
+        {
+            if (_point != null && _point.gameObject.activeInHierarchy)
+                VarifiedPoints.Add(_point);
+        }
+        foreach (var _point in SmallHousePoints)
+        {
+            if (_point != null && _point.gameObject.activeInHierarchy)
+                VarifiedPoints.Add(_point);
+        }
+
+        foreach (var _npc in NPCs)
+        {
+
+            if (VarifiedPoints.Count > NPCs.IndexOf(_npc) && VarifiedPoints[NPCs.IndexOf(_npc)] != null)
+                _npc.GetComponent<NPC>().StartWalkingTowardsPoint(VarifiedPoints[NPCs.IndexOf(_npc)].position);
+            else
+                Debug.LogError("NOT ENOUGH SPACE");
+        }
+    }
+
+    public void SetSacrificePoints()
     {
         foreach (var _npc in NPCs)
         {
             if (standingPoints.Count > NPCs.IndexOf(_npc) && standingPoints[NPCs.IndexOf(_npc)] != null)
-                _npc.GetComponent<NPC>().StartWalkingTowardsPit(standingPoints[NPCs.IndexOf(_npc)].position, WellParent.transform);
+                _npc.GetComponent<NPC>().StartWalkingTowardsPoint(standingPoints[NPCs.IndexOf(_npc)].position, WellParent.transform);
             else
-            {
                 Debug.LogError("NOT ENOUGH SPACE");
-            }
         }
     }
 
@@ -58,7 +89,7 @@ public class AIManager : MonoBehaviour
 
         if (allThere)
         {
-            StartTheCulling();
+            Invoke("StartTheCulling", 1);
             Debug.Log("ALL THERE BABY");
         }
     }
@@ -72,23 +103,47 @@ public class AIManager : MonoBehaviour
 
     IEnumerator ICulling()
     {
+        //Start bowing animation for each NPC
+        foreach (var _npc in NPCs)
+        {
+            _npc.GetComponent<NPC>().BowToPit();
+        }
 
+        //Create a list of only front row people
         List<int> randomNumberList = new List<int>();
-
         for (int i = 0; i < 24; i++)
         {
             randomNumberList.Add(i);
         }
 
-        for (int i = 0; i < 4; i++)
+        //Pick 5 random people from the front row to die
+        for (int i = 0; i < 5; i++)
         {
             yield return new WaitForSeconds(3f);
 
 
             int randomIndex = Random.Range(0, randomNumberList.Count);
+            while (randomNumberList[randomIndex] >= NPCs.Count)
+            {
+                randomIndex = Random.Range(0, randomNumberList.Count);
+                yield return null;
+            }
+
             NPCs[randomNumberList[randomIndex]].GetComponent<NPC>().JumpInPit();
-            randomNumberList.Remove(randomIndex);
+            Debug.Log(randomNumberList[randomIndex]);
+            randomNumberList.RemoveAt(randomIndex);
         }
+
+        yield return new WaitForSeconds(3f);
+
+        //Stop bowing animation for each NPC
+        foreach (var _npc in NPCs)
+        {
+            _npc.GetComponent<NPC>().StopBowing();
+        }
+
+        //Activate cutscene and after culling events
+        GodManager.Instance.OnCullingDone(GodManager.Choices.VolcanoGod);
 
         yield return null;
     }

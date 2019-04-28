@@ -4,10 +4,16 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
-
 {
+    public static UIManager Instance;
+
     public bool IsActive = true;
 
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
@@ -19,7 +25,7 @@ public class UIManager : MonoBehaviour
 
     }
 
-    void ChangeActivity(bool _isActive)
+    public void ChangeCanvasActivity(bool _isActive)
     {
         GetComponent<GraphicRaycaster>().enabled = IsActive = _isActive;
     }

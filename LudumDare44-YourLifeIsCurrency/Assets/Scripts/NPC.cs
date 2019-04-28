@@ -20,12 +20,18 @@ public class NPC : MonoBehaviour
         animator = GetComponentInChildren<Animator>();
     }
 
-    public void StartWalkingTowardsPoint(Vector3 _targetPoint, Transform _pitTransform = null)
+    public void StartWalkingTowardsPit(Vector3 _targetPoint, Transform _pitTransform = null)
     {
         agent.destination = Target = _targetPoint;
         PitTransform = _pitTransform;
 
         AtDestination = false;
+    }
+
+    public void StartWalkingTowardsPoint(Vector3 _targetPoint)
+    {
+        agent.destination = Target = _targetPoint;
+        PitTransform = null;
     }
 
     private void Update()
@@ -50,6 +56,7 @@ public class NPC : MonoBehaviour
     {
         animator.SetBool("IsBowing", false);
         animator.SetBool("IsJumpingInPit", true);
+        
         //Destroy(gameObject);
     }
 

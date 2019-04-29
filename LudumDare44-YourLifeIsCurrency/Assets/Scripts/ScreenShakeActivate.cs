@@ -22,10 +22,10 @@ public class ScreenShakeActivate : MonoBehaviour
         {
             default:
             case 1:
-                ScreenShake.Instance.Shake(2, 0.1f, 0.02f);
+                ScreenShake.Instance.Shake(2, 0.1f, 0.015f);
                 break;
             case 2:
-                ScreenShake.Instance.Shake(2, 0.2f, 0.02f);
+                ScreenShake.Instance.Shake(2, 0.2f, 0.015f);
                 break;
             case 3:
                 ScreenShake.Instance.Shake(2, 0.4f, 0.01f);

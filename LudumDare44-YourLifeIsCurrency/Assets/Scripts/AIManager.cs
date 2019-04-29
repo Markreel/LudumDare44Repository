@@ -14,7 +14,7 @@ public class AIManager : MonoBehaviour
     List<Transform> standingPoints = new List<Transform>();
 
     public GameObject OutsidePointsParent;
-    List<Transform> OutsidePoints = new List<Transform>();
+    public List<Transform> OutsidePoints = new List<Transform>();
     public List<Transform> SmallHousePoints = new List<Transform>();
     public List<Transform> BigHousePoints = new List<Transform>();
     public Transform PalacePoint;
@@ -52,7 +52,7 @@ public class AIManager : MonoBehaviour
     /// Spawns a given amount of NPC's at a random OutsidePoint
     /// </summary>
     /// <param name="_amount"></param>
-    void SpawnNPCs(int _amount, float _spawnDuration)
+    public void SpawnNPCs(int _amount, float _spawnDuration)
     {
         if (spawnNPCsRoutine != null) StopCoroutine(spawnNPCsRoutine);
         spawnNPCsRoutine = StartCoroutine(ISpawnNPCs(_amount, _spawnDuration));
@@ -60,7 +60,11 @@ public class AIManager : MonoBehaviour
 
     IEnumerator ISpawnNPCs(int _amount, float _spawnDuration)
     {
-        List<Transform> TempPoints = OutsidePoints;
+        List<Transform> TempPoints = new List<Transform>();
+        foreach (var _point in OutsidePoints)
+        {
+            TempPoints.Add(_point);
+        }
 
         for (int i = 0; i < _amount; i++)
         {

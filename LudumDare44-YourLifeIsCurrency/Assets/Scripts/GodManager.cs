@@ -36,8 +36,7 @@ public class GodManager : MonoBehaviour
     public PlayableAsset VolcanoLevel1;
     public PlayableAsset VolcanoLevel2;
     public PlayableAsset VolcanoLevel3;
-    public PlayableAsset VolcanoLevel4;
-    public PlayableAsset VolcanoLevel5; //(Uitbarsting) - Game over
+    public PlayableAsset VolcanoLevel4; //(Uitbarsting) - Game over
 
 
     public int CurrentLevel;
@@ -49,6 +48,8 @@ public class GodManager : MonoBehaviour
     public GameObject[] SmallHouses;
     public GameObject[] BigHouses;
     public GameObject Palace;
+
+    Coroutine checkGodStatusRoutine;
 
     private void Awake()
     {
@@ -101,7 +102,7 @@ public class GodManager : MonoBehaviour
 
         Director.Play();
 
-        Invoke("LevelUpGods", (float)Director.duration);
+        Invoke("LevelUpGods", (float)Director.duration); //DOE DIT PAS NADAT ALLE NPC'S THUIS ZIJN
         AIManager.Instance.Invoke("ReturnToHome", (float)Director.duration);
     }
 
@@ -136,16 +137,60 @@ public class GodManager : MonoBehaviour
 
     void CheckGodStatus()
     {
-        switch (SunLevel)
+        if (checkGodStatusRoutine != null) StopCoroutine(checkGodStatusRoutine);
+        checkGodStatusRoutine = StartCoroutine(ICheckGodStatus());
+    }
+
+    IEnumerator ICheckGodStatus()
+    {
+        switch (FurtilityLevel)
         {
-            case 1:
-                Director.playableAsset = SunGoingDown1;
-                Director.Play();
+            case 2:
+                AIManager.Instance.SpawnNPCs(15, 3);
+                yield return new WaitForSeconds(3);
                 break;
 
+            case 3:
+                AIManager.Instance.SpawnNPCs(15, 3);
+                yield return new WaitForSeconds(3);
+                break;
+
+            case 4:
+                AIManager.Instance.SpawnNPCs(15, 3);
+                yield return new WaitForSeconds(3);
+                break;
+
+            case 5:
+                AIManager.Instance.SpawnNPCs(15, 3);
+                yield return new WaitForSeconds(3);
+                break;
+        }
+
+        switch (BuildingLevel)
+        {
+            //case 1:
+            //    SmallHouses[0].SetActive(true);
+            //    yield return new WaitForSeconds(1);
+            //    break;
+
             case 2:
-                Director.playableAsset = SunGoingDown2;
-                Director.Play();
+                SmallHouses[1].SetActive(true);
+                yield return new WaitForSeconds(1);
+                break;
+
+            case 3:
+                BigHouses[0].SetActive(true);
+                yield return new WaitForSeconds(1);
+                break;
+
+            case 4:
+                BigHouses[0].SetActive(true);
+                yield return new WaitForSeconds(1);
+                break;
+
+            case 5:
+                Palace.SetActive(true);
+                yield return new WaitForSeconds(1);
                 break;
         }
 
@@ -160,83 +205,62 @@ public class GodManager : MonoBehaviour
                 break;
 
             case 3:
-                //mensen en level1 gebouwen wegwaaien
+                //mensen wegwaaien
                 break;
 
             case 4:
-                //alle mensen en gebouwen wegwaaien - GAME OVER
+                //alle mensen en gebouwen wegwaaien
                 break;
         }
 
-        switch (BuildingLevel)
+        switch (SunLevel)
         {
             case 1:
-                SmallHouses[0].SetActive(true);
+                Director.playableAsset = SunGoingDown1;
+                Director.Play();
+                yield return new WaitForSeconds((float)SunGoingDown1.duration);
                 break;
 
             case 2:
-                SmallHouses[1].SetActive(true);
-                break;
-
-            case 3:
-                BigHouses[0].SetActive(true);
-                break;
-
-            case 4:
-                BigHouses[0].SetActive(true);
-                break;
-
-            case 5:
-                Palace.SetActive(true);
+                Director.playableAsset = SunGoingDown2;
+                Director.Play();
+                yield return new WaitForSeconds((float)SunGoingDown2.duration);
                 break;
         }
 
         switch (VolcanoLevel)
         {
             case 1:
+                Director.playableAsset = VolcanoLevel1;
+                Director.Play();
+                yield return new WaitForSeconds((float)VolcanoLevel1.duration);
                 //zachte tril en beetje licht
                 break;
 
             case 2:
-                //iets hardere tril en iets meer licht
+                Director.playableAsset = VolcanoLevel2;
+                Director.Play();
+                yield return new WaitForSeconds((float)VolcanoLevel2.duration);
+                //iets hardere tril, iets meer licht en beetje rook
                 break;
 
             case 3:
-                //iets hardere tril, meer licht en een beetje rook
+                Director.playableAsset = VolcanoLevel3;
+                Director.Play();
+                yield return new WaitForSeconds((float)VolcanoLevel3.duration);
+                //iets hardere tril, meer licht en meer rook
                 break;
 
             case 4:
-                //harde tril, veel licht en een veel rook
-                break;
-
-            case 5:
+                Director.playableAsset = VolcanoLevel4;
+                Director.Play();
+                yield return new WaitForSeconds((float)VolcanoLevel4.duration);
                 //enorme tril, enorm veel licht, enorm veel rook en eruptie - GAME OVER
                 break;
         }
 
-        switch (FurtilityLevel)
-        {
-            case 1:
-                //+15 mensen
-                break;
 
-            case 2:
-                //+15 mensen
-                break;
-
-            case 3:
-                //+15 mensen
-                break;
-
-            case 4:
-                //+15 mensen
-                break;
-
-            case 5:
-                //+15 mensen
-                break;
-        }
-
+        yield return null;
     }
 }
 

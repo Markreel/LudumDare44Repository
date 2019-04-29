@@ -1,0 +1,39 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!21 &2100000
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: WaterMovingMat
+  m_Shader: {fileID: 4800000, guid: 5f1d8cd1c76fb664d9b1dca705dc8f17, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap:
+    MotionVector: User
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Floats:
+    - Vector1_16923FC1: 4.45
+    - Vector1_19BE40A: 1.18
+    - Vector1_921C6C8A: 3.86
+    - Vector1_BF453640: 0.1
+    - Vector1_D20C72DD: 1
+    - Vector1_D7522768: 0.5
+    - Vector1_E28F52FC: 1.3
+    - Vector1_E5EA4325: 3.9
+    - Vector1_E938FD52: 172.66
+    m_Colors:
+    - Color_172D2336: {r: 0, g: 0.8467736, b: 1, a: 0}
+    - Color_373B15FB: {r: 1, g: 1, b: 1, a: 0}
+    - Color_9E6DE43: {r: 0, g: 1, b: 0.768116, a: 0.45490196}
+    - Vector2_86B86A28: {r: -0.1, g: -0.05, b: 0, a: 0}
+    - _EmissionColor: {r: 1, g: 1, b: 1, a: 1}

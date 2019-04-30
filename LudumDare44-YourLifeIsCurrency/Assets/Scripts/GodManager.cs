@@ -38,6 +38,14 @@ public class GodManager : MonoBehaviour
     public PlayableAsset VolcanoLevel3;
     public PlayableAsset VolcanoLevel4; //(Uitbarsting) - Game over
 
+    [Space]
+
+    public PlayableAsset WindLevel1;
+    public PlayableAsset WindLevel2;
+    public PlayableAsset WindLevel3;
+    public PlayableAsset WindLevel4; //(Iedereen en alles waait weg) - Game over
+    public bool IsWaitingForAllToGoInside = false;
+
 
     public int CurrentLevel;
 
@@ -65,6 +73,9 @@ public class GodManager : MonoBehaviour
 
     public void OnChoiceMade(int _choiceIndex)
     {
+        UIManager.Instance.ChangeCanvasActivity(false);
+        UIManager.Instance.DisableButton(_choiceIndex);
+
         Director.playableAsset = PanToPitPlayable;
         Director.Play();
 
@@ -101,12 +112,10 @@ public class GodManager : MonoBehaviour
 
 
         Director.Play();
-
-        Invoke("LevelUpGods", (float)Director.duration); //DOE DIT PAS NADAT ALLE NPC'S THUIS ZIJN
         AIManager.Instance.Invoke("ReturnToHome", (float)Director.duration);
     }
 
-    void LevelUpGods()
+    public void LevelUpGods()
     {
         if (!WindGodActive)
             WindLevel++;
@@ -139,6 +148,14 @@ public class GodManager : MonoBehaviour
     {
         if (checkGodStatusRoutine != null) StopCoroutine(checkGodStatusRoutine);
         checkGodStatusRoutine = StartCoroutine(ICheckGodStatus());
+    }
+
+    bool IsEveryoneInside()
+    {
+        if (IsWaitingForAllToGoInside)
+            return false;
+        else
+            return true;
     }
 
     IEnumerator ICheckGodStatus()
@@ -198,33 +215,48 @@ public class GodManager : MonoBehaviour
         {
             case 1:
                 //kampvuur uit waaien
+
+                //Wacht tot iedereen binnen is voor animatie
+                //IsWaitingForAllToGoInside = true;
+                AIManager.Instance.GoInside();
+
+                //Ranzig gehardcode want dat andere joch werkt voor een of andere reden niet
+                yield return new WaitForSeconds(7);
+                //yield return new WaitUntil(IsEveryoneInside);
+
+                Director.playableAsset = WindLevel1;
+                Director.Play();
+                yield return new WaitForSeconds((float)WindLevel1.duration);
                 break;
 
             case 2:
                 //mensen wegwaaien
+                AIManager.Instance.GoInside();
+                yield return new WaitForSeconds(7);
+
+                Director.playableAsset = WindLevel2;
+                Director.Play();
+                yield return new WaitForSeconds((float)WindLevel2.duration);
                 break;
 
             case 3:
-                //mensen wegwaaien
+                //mensen en simpele gebouwen wegwaaien
+                AIManager.Instance.GoInside();
+                yield return new WaitForSeconds(7);
+
+                Director.playableAsset = WindLevel3;
+                Director.Play();
+                yield return new WaitForSeconds((float)WindLevel3.duration);
                 break;
 
             case 4:
-                //alle mensen en gebouwen wegwaaien
-                break;
-        }
+                //alle mensen en gebouwen wegwaaien GAME OVER
+                AIManager.Instance.GoInside();
+                yield return new WaitForSeconds(7);
 
-        switch (SunLevel)
-        {
-            case 1:
-                Director.playableAsset = SunGoingDown1;
+                Director.playableAsset = WindLevel4;
                 Director.Play();
-                yield return new WaitForSeconds((float)SunGoingDown1.duration);
-                break;
-
-            case 2:
-                Director.playableAsset = SunGoingDown2;
-                Director.Play();
-                yield return new WaitForSeconds((float)SunGoingDown2.duration);
+                yield return new WaitForSeconds((float)WindLevel4.duration);
                 break;
         }
 
@@ -258,6 +290,28 @@ public class GodManager : MonoBehaviour
                 //enorme tril, enorm veel licht, enorm veel rook en eruptie - GAME OVER
                 break;
         }
+
+        switch (SunLevel)
+        {
+            case 1:
+                Director.playableAsset = SunGoingDown1;
+                Director.Play();
+                yield return new WaitForSeconds((float)SunGoingDown1.duration);
+                break;
+
+            case 2:
+                Director.playableAsset = SunGoingDown2;
+                Director.Play();
+                yield return new WaitForSeconds((float)SunGoingDown2.duration);
+                break;
+        }
+
+        if (AIManager.Instance.NPCs.Count == 0 || SunLevel >= 2 || VolcanoLevel >= 4)
+            UIManager.Instance.GameOver();
+        else if (BuildingLevel >= 5)
+            UIManager.Instance.GameWon();
+        else
+            UIManager.Instance.ChangeCanvasActivity(true);
 
 
         yield return null;

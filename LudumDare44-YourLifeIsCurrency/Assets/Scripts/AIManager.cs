@@ -29,6 +29,8 @@ public class AIManager : MonoBehaviour
     {
         Instance = this;
 
+        //Time.timeScale = 2;
+
         //Gets all possible standingpoints around the pit
         foreach (Transform _point in WellParent.transform)
         {
@@ -42,7 +44,7 @@ public class AIManager : MonoBehaviour
         }
 
         //Spawns the starting amount of NPCs
-        SpawnNPCs(15,1);
+        SpawnNPCs(15,1, true);
 
         //Gets all NPC's that are parented to this gameobject
         RefreshNPCList();
@@ -52,13 +54,13 @@ public class AIManager : MonoBehaviour
     /// Spawns a given amount of NPC's at a random OutsidePoint
     /// </summary>
     /// <param name="_amount"></param>
-    public void SpawnNPCs(int _amount, float _spawnDuration)
+    public void SpawnNPCs(int _amount, float _spawnDuration, bool _enableCanvasAfterwards = false)
     {
         if (spawnNPCsRoutine != null) StopCoroutine(spawnNPCsRoutine);
-        spawnNPCsRoutine = StartCoroutine(ISpawnNPCs(_amount, _spawnDuration));
+        spawnNPCsRoutine = StartCoroutine(ISpawnNPCs(_amount, _spawnDuration, _enableCanvasAfterwards));
     }
 
-    IEnumerator ISpawnNPCs(int _amount, float _spawnDuration)
+    IEnumerator ISpawnNPCs(int _amount, float _spawnDuration, bool _enableCanvasAfterwards = false)
     {
         List<Transform> TempPoints = new List<Transform>();
         foreach (var _point in OutsidePoints)
@@ -85,6 +87,9 @@ public class AIManager : MonoBehaviour
             yield return new WaitForSeconds(_spawnDuration / _amount);
         }
 
+        if (_enableCanvasAfterwards)
+            UIManager.Instance.ChangeCanvasActivity(true);
+
         yield return null;
     }
 
@@ -104,29 +109,61 @@ public class AIManager : MonoBehaviour
 
     public void ReturnToHome()
     {
-        List<Transform> VarifiedPoints = new List<Transform>();
-        foreach (var _point in BigHousePoints)
-        {
-            if (_point != null && _point.gameObject.activeInHierarchy)
-                VarifiedPoints.Add(_point);
-        }
-        foreach (var _point in SmallHousePoints)
-        {
-            if (_point != null && _point.gameObject.activeInHierarchy)
-                VarifiedPoints.Add(_point);
-        }
+        //List<Transform> VarifiedPoints = new List<Transform>();
+        //foreach (var _point in BigHousePoints)
+        //{
+        //    if (_point != null && _point.gameObject.activeInHierarchy)
+        //        VarifiedPoints.Add(_point);
+        //}
+        //foreach (var _point in SmallHousePoints)
+        //{
+        //    if (_point != null && _point.gameObject.activeInHierarchy)
+        //        VarifiedPoints.Add(_point);
+        //}
 
         foreach (var _npc in NPCs)
         {
 
-            if (VarifiedPoints.Count > NPCs.IndexOf(_npc) && VarifiedPoints[NPCs.IndexOf(_npc)] != null)
-                _npc.GetComponent<NPC>().StartWalkingTowardsPoint(VarifiedPoints[NPCs.IndexOf(_npc)].position);
-
-            else if (OutsidePoints.Count > NPCs.IndexOf(_npc) && OutsidePoints[NPCs.IndexOf(_npc)] != null)
-                _npc.GetComponent<NPC>().StartWalkingTowardsPoint(OutsidePoints[NPCs.IndexOf(_npc)].position);
+            //if (VarifiedPoints.Count > NPCs.IndexOf(_npc) && VarifiedPoints[NPCs.IndexOf(_npc)] != null)
+               // _npc.GetComponent<NPC>().StartWalkingTowardsPoint(VarifiedPoints[NPCs.IndexOf(_npc)].position);
+            //else if
+            if (OutsidePoints.Count > NPCs.IndexOf(_npc) && OutsidePoints[NPCs.IndexOf(_npc)] != null)
+                _npc.GetComponent<NPC>().StartWalkingTowardsHome(OutsidePoints[NPCs.IndexOf(_npc)].position);
 
             else
                 Debug.LogError("NOT ENOUGH SPACE");
+        }
+    }
+
+    public void GoInside()
+    {
+        Debug.Log("GOING INSIDE");
+        List<Transform> _smallHousePoints = new List<Transform>();
+        List<Transform> _bigHousePoints = new List<Transform>();
+
+        foreach (var _point in BigHousePoints)
+        {
+            if (_point != null && _point.gameObject.activeInHierarchy)
+                _bigHousePoints.Add(_point);
+        }
+        foreach (var _point in SmallHousePoints)
+        {
+            if (_point != null && _point.gameObject.activeInHierarchy)
+                _smallHousePoints.Add(_point);
+        }
+
+        foreach (var _npc in NPCs)
+        {
+            
+
+            if (_bigHousePoints.Count > NPCs.IndexOf(_npc) && _bigHousePoints[NPCs.IndexOf(_npc)] != null)
+                _npc.GetComponent<NPC>().StartWalkingTowardsHome(_bigHousePoints[NPCs.IndexOf(_npc)].position, NPC.Location.BigHouse);
+
+            else if (_smallHousePoints.Count + _bigHousePoints.Count > NPCs.IndexOf(_npc) && _smallHousePoints[NPCs.IndexOf(_npc) - _bigHousePoints.Count] != null)
+                _npc.GetComponent<NPC>().StartWalkingTowardsHome(_smallHousePoints[NPCs.IndexOf(_npc) - _bigHousePoints.Count].position, NPC.Location.SmallHouse);
+
+            else
+                GodManager.Instance.IsWaitingForAllToGoInside = false;
         }
     }
 
@@ -142,12 +179,12 @@ public class AIManager : MonoBehaviour
     }
 
     //5 VAN DE EERSTE 24 MANNEN MOETEN SPRINGEN
-    public void CheckIfAllAtDestination()
+    public void CheckIfAllAtPit()
     {
         bool allThere = true;
         foreach (var _npc in NPCs)
         {
-            if (!_npc.GetComponent<NPC>().AtDestination)
+            if (!_npc.GetComponent<NPC>().AtPit)
                 allThere = false;
         }
 
@@ -156,6 +193,32 @@ public class AIManager : MonoBehaviour
             Invoke("StartTheCulling", 1);
             Debug.Log("ALL THERE BABY");
         }
+    }
+
+    public void CheckIfAllAtHome()
+    {
+        bool allThere = true;
+        foreach (var _npc in NPCs)
+        {
+            if (!_npc.GetComponent<NPC>().AtHome)
+                allThere = false;
+        }
+
+        if (allThere)
+            GodManager.Instance.LevelUpGods();
+    }
+
+    public void CheckIfAllInside()
+    {
+        bool allThere = true;
+        foreach (var _npc in NPCs)
+        {
+            if (!_npc.GetComponent<NPC>().AtHome)
+                allThere = false;
+        }
+
+        if (allThere)
+            GodManager.Instance.IsWaitingForAllToGoInside = false;
     }
 
     void StartTheCulling()

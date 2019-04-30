@@ -5,19 +5,23 @@ using UnityEngine.AI;
 
 public class NPC : MonoBehaviour
 {
+    public enum Location { Outside, SmallHouse, BigHouse }
+    public Location CurrentLocation = Location.Outside;
+
     public Vector3 Target;
 
-    Animator animator;
+    public Animator Animator;
     NavMeshAgent agent;
 
     public Transform PitTransform;
 
-    public bool AtDestination = true;
+    public bool AtPit = true;
+    public bool AtHome = true;
 
     private void Awake()
     {
         agent = GetComponent<NavMeshAgent>();
-        animator = GetComponentInChildren<Animator>();
+        Animator = GetComponentInChildren<Animator>();
     }
 
     public void StartWalkingTowardsPit(Vector3 _targetPoint, Transform _pitTransform = null)
@@ -25,48 +29,63 @@ public class NPC : MonoBehaviour
         agent.destination = Target = _targetPoint;
         PitTransform = _pitTransform;
 
-        AtDestination = false;
+        AtPit = false;
     }
 
-    public void StartWalkingTowardsPoint(Vector3 _targetPoint)
+    public void StartWalkingTowardsHome(Vector3 _targetPoint, Location _location = Location.Outside)
     {
         agent.destination = Target = _targetPoint;
         PitTransform = null;
+
+        CurrentLocation = _location;
+
+        AtPit = true;
+        AtHome = false;
     }
 
     private void Update()
     {
         if (agent.velocity.x != 0 || agent.velocity.z != 0)
-            animator.SetBool("IsWalking", true);
+            Animator.SetBool("IsWalking", true);
 
         else
-            animator.SetBool("IsWalking", false);
+            Animator.SetBool("IsWalking", false);
 
-        if (transform.position == agent.destination && !AtDestination)
+        if (transform.position == agent.destination && !AtPit)
         {
             //Debug.Log("AtDestination");
             if (PitTransform != null)
                 transform.LookAt(PitTransform);
-            AtDestination = true;
-            AIManager.Instance.CheckIfAllAtDestination();
+            AtPit = true;
+            AIManager.Instance.CheckIfAllAtPit();
+        }
+
+        if (transform.position == agent.destination && !AtHome)
+        {
+            AtHome = true;
+            if (CurrentLocation == Location.Outside)
+                AIManager.Instance.CheckIfAllAtHome();
+            else
+                AIManager.Instance.CheckIfAllInside();
+
         }
     }
 
     public void JumpInPit()
     {
-        animator.SetBool("IsBowing", false);
-        animator.SetBool("IsJumpingInPit", true);
-        
+        Animator.SetBool("IsBowing", false);
+        Animator.SetBool("IsJumpingInPit", true);
+
         //Destroy(gameObject);
     }
 
     public void BowToPit()
     {
-        animator.SetBool("IsBowing", true);
+        Animator.SetBool("IsBowing", true);
     }
 
     public void StopBowing()
     {
-        animator.SetBool("IsBowing", false);
+        Animator.SetBool("IsBowing", false);
     }
 }

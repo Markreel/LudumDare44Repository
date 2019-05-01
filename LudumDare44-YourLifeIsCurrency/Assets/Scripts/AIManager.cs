@@ -29,7 +29,7 @@ public class AIManager : MonoBehaviour
     {
         Instance = this;
 
-        //Time.timeScale = 2;
+        //Time.timeScale = 8;
 
         //Gets all possible standingpoints around the pit
         foreach (Transform _point in WellParent.transform)
@@ -121,18 +121,24 @@ public class AIManager : MonoBehaviour
         //        VarifiedPoints.Add(_point);
         //}
 
-        foreach (var _npc in NPCs)
+        if (NPCs.Count == 0)
+            GodManager.Instance.LevelUpGods();
+        else
         {
+            foreach (var _npc in NPCs)
+            {
 
-            //if (VarifiedPoints.Count > NPCs.IndexOf(_npc) && VarifiedPoints[NPCs.IndexOf(_npc)] != null)
-               // _npc.GetComponent<NPC>().StartWalkingTowardsPoint(VarifiedPoints[NPCs.IndexOf(_npc)].position);
-            //else if
-            if (OutsidePoints.Count > NPCs.IndexOf(_npc) && OutsidePoints[NPCs.IndexOf(_npc)] != null)
-                _npc.GetComponent<NPC>().StartWalkingTowardsHome(OutsidePoints[NPCs.IndexOf(_npc)].position);
+                //if (VarifiedPoints.Count > NPCs.IndexOf(_npc) && VarifiedPoints[NPCs.IndexOf(_npc)] != null)
+                   // _npc.GetComponent<NPC>().StartWalkingTowardsPoint(VarifiedPoints[NPCs.IndexOf(_npc)].position);
+                //else if
+                if (OutsidePoints.Count > NPCs.IndexOf(_npc) && OutsidePoints[NPCs.IndexOf(_npc)] != null)
+                    _npc.GetComponent<NPC>().StartWalkingTowardsHome(OutsidePoints[NPCs.IndexOf(_npc)].position);
 
-            else
-                Debug.LogError("NOT ENOUGH SPACE");
+                else
+                    Debug.LogError("NOT ENOUGH SPACE");
+            }
         }
+
     }
 
     public void GoInside()

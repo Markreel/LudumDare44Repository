@@ -51,6 +51,12 @@ public class FlyObjectActivator : MonoBehaviour
                         _npc.GetComponent<NPC>().Animator.SetBool("IsFlyingAway", true);
                         DeadNPCist.Add(_npc);
                     }
+                    //Invoke een fly animatie op NPCscript met een korte delay zodat eerst het huis wegvliegt en daarna de NPC's die binnenzitten pas.
+                    else if (_npc.GetComponent<NPC>().CurrentLocation == NPC.Location.SmallHouse)
+                    {
+                        _npc.GetComponent<NPC>().Animator.SetBool("IsFlyingAway", true);
+                        DeadNPCist.Add(_npc);
+                    }
                 }
                 break;
         }

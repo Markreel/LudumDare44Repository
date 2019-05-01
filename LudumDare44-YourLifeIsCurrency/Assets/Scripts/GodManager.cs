@@ -69,6 +69,9 @@ public class GodManager : MonoBehaviour
         BigHouses[0].SetActive(false);
         BigHouses[1].SetActive(false);
         Palace.SetActive(false);
+
+        WindGodActive = SunGodActive = BuildingGodActive = VolcanoGodActive = FurtilityGodActive = false;
+        WindLevel = SunLevel = BuildingLevel = VolcanoLevel = FurtilityLevel = 0;
     }
 
     public void OnChoiceMade(int _choiceIndex)
@@ -201,7 +204,7 @@ public class GodManager : MonoBehaviour
                 break;
 
             case 4:
-                BigHouses[0].SetActive(true);
+                BigHouses[1].SetActive(true);
                 yield return new WaitForSeconds(1);
                 break;
 
@@ -308,7 +311,7 @@ public class GodManager : MonoBehaviour
 
         if (AIManager.Instance.NPCs.Count == 0 || SunLevel >= 2 || VolcanoLevel >= 4)
             UIManager.Instance.GameOver();
-        else if (BuildingLevel >= 5)
+        else if (BuildingLevel >= 5 || FurtilityLevel >= 5)
             UIManager.Instance.GameWon();
         else
             UIManager.Instance.ChangeCanvasActivity(true);
